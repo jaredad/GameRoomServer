@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Profile {
@@ -22,7 +24,12 @@ public class Profile {
 
 	final static int fileLines = 4;
 
-	public Profile(String serialized) {
-		
+	public void deserialize(String serialized) throws ClassNotFoundException, SQLException {
+		System.out.println(serialized);
+		String[] prof = serialized.split("~");
+		List<String> profile = Arrays.asList(prof);
+		Database database = new Database();
+		database.handleProfile(profile);
+		System.out.println(profile);
 	}
 }

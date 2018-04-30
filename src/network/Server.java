@@ -7,12 +7,14 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import centralCode.MessageHandler;
 import javafx.application.Platform;
 
 public class Server {
 
 	private final int portNum = 8888;
 	private ServerSocket server;
+	public MessageHandler handler = new MessageHandler();
 
 	public Server() {
 		try {
@@ -45,8 +47,7 @@ public class Server {
 			while (responses.ready()) {
 				sb.append(responses.readLine());
 			}
-			System.out.println(sb.toString());
-			//dealWithInput(sb.toString().toString());
+			handler.handleMessage(sb.toString());
 			s.close();
 
 		} catch (Exception e) {
@@ -59,7 +60,7 @@ public class Server {
 		new Thread(() -> {
 			try {
 				Socket target = new Socket(host, portNum);
-				send(target, ord + message);
+				send(target, ord + " " + message);
 				target.close();
 			} catch (Exception e) {
 				//Platform.runLater(() -> bad.badNews(e.getMessage()));

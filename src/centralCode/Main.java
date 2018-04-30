@@ -9,7 +9,7 @@ import profile.Database;
 
 public class Main {
 
-	static Server server;
+	public static Server server;
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
 		Database data = new Database();
 		System.out.println("Hello World!");
@@ -30,4 +30,6 @@ public class Main {
 			}
 		}).start();
 	}
+	
+	
 }
