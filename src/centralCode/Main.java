@@ -11,7 +11,7 @@ public class Main {
 
 	public static Server server;
 	public static void main(String[] args) throws SQLException, ClassNotFoundException {
-		Database data = new Database();
+		Database d = new Database();
 		System.out.println("Hello World!");
 		server = new Server();
 		listen();
@@ -27,7 +27,7 @@ public class Main {
 			} catch (IOException e) {
 				//Platform.runLater(() -> bad.badNews(e.getMessage()));
 				e.printStackTrace();
-			}
+			} 
 		}).start();
 	}
 	

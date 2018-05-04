@@ -19,26 +19,30 @@ public class Lobby {
 	List<PeopleInGame> end_matcher = new ArrayList<PeopleInGame>();
 	List<PeopleInGame> end_brickbreak = new ArrayList<PeopleInGame>();
 	List<PeopleInGame> end_blackhole = new ArrayList<PeopleInGame>();
+	List<PeopleInGame> end_toRemove  = new ArrayList<PeopleInGame>();
+	
+	
 	
 	
 	final static int MAX_SIZE = 2;
 	
 	
 	public void addToLobby(String r) throws ClassNotFoundException, SQLException {
-		System.out.println(r);
+		System.out.println("addToLobby message:" + r);
 		String[] request = r.split(" ");
 		List<String> request_list = Arrays.asList(request);
-		System.out.println(request_list);
+		System.out.println("request list: " + request_list);
 		String game = request_list.get(0);
+		System.out.println("@" + game + "@");
 		if (game.equals("Galalite_2")) {
 			galalite.add(request_list.get(1));
 			checkLobby(galalite, "Galalite_2", end_galalite);
 			
 		} else if (game.equals("Matcher")) {
-			System.out.println(matcher);
+			System.out.println("Matcher: " + matcher.toString());
 			matcher.add(request_list.get(1));
 			checkLobby(matcher, "Matcher", end_matcher);
-			System.out.println(matcher);
+			System.out.println("Matcher: " + matcher);
 			
 		} else if (game.equals("Black_Hole")) {
 			blackhole.add(request_list.get(1));
@@ -54,8 +58,8 @@ public class Lobby {
 			System.out.println("max size reached");
 			sendFoundGame(lobby.get(0), game);
 			sendFoundGame(lobby.get(1), game);
-			System.out.println("before");
-			System.out.println(lobby.get(0)+ " " + lobby.get(1));
+			System.out.println("checklobby :" + game);
+			System.out.println("player ids: " + lobby.get(0)+ " " + lobby.get(1));
 			combatants.add(new PeopleInGame(lobby.get(0), lobby.get(1)));
 			lobby.clear();
 		}
@@ -66,42 +70,52 @@ public class Lobby {
 		if (game.equals("Matcher")) {
 			System.out.println("in matcher");
 			for (PeopleInGame m : end_matcher) {
-				System.out.println(m.getPlayer1() + "//////");
+				System.out.println(m.getPlayer1() + " in findCombat");
 				if (fcHelper(pig, m, id, score)) {
-					pig = pigSet(m);
-					System.out.println(end_matcher.get(0) + "endmatchertest");
-					end_matcher.remove(m);
+					System.out.println("findCombatant after fcHelper if, scores: " + pig.getS1() + " " + pig.getS2());
+					System.out.println(end_matcher.get(0) + " endmatchertest");
+					end_toRemove.add(m);
 				}
 			}
+			remove(end_matcher);
 		} else if (game.equals("Black_Hole")) {
 			for (PeopleInGame b : end_blackhole) {
 				if (fcHelper(pig, b, id, score)) {
-					pig = pigSet(b);
-					end_blackhole.remove(b);
+					end_toRemove.add(b);
 				}
 			}
+			remove(end_blackhole);
 		} else if (game.equals("Galalite_2")) {
 			for (PeopleInGame g : end_galalite) {
 				if (fcHelper(pig, g, id, score)) {
-					pig = pigSet(g);
-					end_galalite.remove(g);
+					end_toRemove.add(g);
 				}
 			}
+			remove(end_galalite);
 		} else {
 			for (PeopleInGame br : end_brickbreak) {
 				if (fcHelper(pig, br, id, score)) {
-					pig = pigSet(br);
-					end_brickbreak.remove(br);
+					end_toRemove.add(br);
 				}
 			}
+			remove(end_brickbreak);
 		}
 		return pig;
 	}
 	
+	private void remove(List<PeopleInGame> end_list) {
+		System.out.println("end before: " + end_list.toString());
+		for (PeopleInGame m : end_toRemove) {
+			end_list.remove(m);
+		}
+		end_toRemove.clear();
+		System.out.println("end after: " + end_list.toString());
+	}
+	
 	private boolean fcHelper(PeopleInGame pig, PeopleInGame m, String id, String score) {
-		System.out.println(m.getPlayer1() + " " + m.getPlayer2()+"fffffffffff "+id);
+		System.out.println("before if in fcHelper: " + m.getPlayer1() + " " + m.getPlayer2()+" "+id);
 		if (m.getPlayer1().equals(id) || m.getPlayer2().equals(id)) {
-			System.out.println(m.getPlayer1() + " " + m.getPlayer2());
+			System.out.println("after if in fcHelper: " + m.getPlayer1() + " " + m.getPlayer2());
 			if (m.getPlayer1().equals(id)) {
 				m.oneIsDone();
 				m.setS1(score);
@@ -120,19 +134,12 @@ public class Lobby {
 				pig.setS2(m.getS2());
 			}
 			if (pig.done1() && pig.done2()) {
+				System.out.println("fcHelper is true and done");
 				return true;
 			}
 		}
+		System.out.println("fcHelper is false and done");
 		return false;
-	}
-	
-	private PeopleInGame pigSet(PeopleInGame m) {
-		PeopleInGame pig = new PeopleInGame(m.getPlayer1(), m.getPlayer2());
-		pig.setS1(m.getS1());
-		pig.setS2(m.getS2());
-		pig.oneIsDone();
-		pig.twoIsDone();
-		return pig;
 	}
 	
 	private void sendFoundGame(String id, String game) throws ClassNotFoundException, SQLException {
